@@ -1,0 +1,38 @@
+{
+  "name": "@mihar/wc-context",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "Rahim Alwer <rahim_alwer@hotmail.com>",
+  "description": "Pass props down web component trees easily.",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "@types/",
+  "homepage": "https://github.com/mihar-22/wc-context",
+  "bugs": {
+    "url": "https://github.com/mihar-22/wc-context"
+  },
+  "files": [
+    "dist/",
+    "@types/"
+  ],
+  "scripts": {
+    "build": "rimraf dist && npm run build:cjs && npm run build:esm",
+    "build:cjs": "tsc --module commonjs --outDir dist/cjs",
+    "build:esm": "tsc --module es2015 --outDir dist/esm",
+    "release": "semantic-release"
+  },
+  "devDependencies": {
+    "rimraf": "^3.0.2",
+    "semantic-release": "^17.0.0",
+    "typescript": "^4.0.0"
+  },
+  "keywords": [
+    "web-components",
+    "tunnel",
+    "context",
+    "provider"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "esModuleInterop": true,
+    "alwaysStrict": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "allowSyntheticDefaultImports": true,
+    "allowUnreachableCode": false,
+    "forceConsistentCasingInFileNames": true,
+    "experimentalDecorators": true,
+    "lib": ["dom", "es2017"],
+    "moduleResolution": "node",
+    "module": "ESNext",
+    "target": "ESNext",
+    "declaration": true,
+    "declarationMap": true,
+    "declarationDir": "@types",
+    "sourceMap": true,
+    "outDir": "dist",
+  },
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules/**"
+  ]
+}

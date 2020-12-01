@@ -43,7 +43,7 @@ $: pnpm install @wcom/context
 ## Usage
 
 If you've used `React.ContextProvider` before you should already have the concepts down. Simply when 
-we create a context we receive a `provide` and `consume` method. Each context can only have a single 
+we create a context we receive a `provide` and `consume` decorator. Each context can only have a single 
 provider who is responsible for updating the current value. However, each context can have many 
 consumers who simply listen for updates on when the value is changed. A context can be any 
 data type such as a `string`, `boolean`, `array`, `object` etc. 

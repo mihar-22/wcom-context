@@ -82,6 +82,8 @@ interface Context<T> {
 1. Let's create out context...
 
 ```ts
+import { createContext } from '@wcom/context';
+
 export const myContext = createContext(10);
 ```
 

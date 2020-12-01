@@ -1,0 +1,1 @@
+export * from '../dist/esm/integrations/lit-element';

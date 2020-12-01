@@ -19,6 +19,8 @@
 
 ## Introduction
 
+> most implementation thanks to @furf.
+
 wip.
 
 ## Related Packages

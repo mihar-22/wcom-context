@@ -42,7 +42,7 @@ export default function createContext<T>(defaultValue?: T): Context<T> {
   const context: Context<T> = {
     defaultValue,
     provide() {
-      return function decorateContextProvider(providerProto, contextProperty) {
+      return function decorateContextProvider(providerProto, contextPropertyName) {
         const { connectedCallback, disconnectedCallback } = providerProto;
 
         function onConsumerConnect(this: Provider, event: Event) {
@@ -73,7 +73,7 @@ export default function createContext<T>(defaultValue?: T): Context<T> {
           onConnectToProvider(onDisconnectFromProvider);
           
           // Set the consumer's context to the provider's initial (or default) value.
-          onProviderUpdate(new ContextProviderUpdateEvent(this[contextProperty]));
+          onProviderUpdate(new ContextProviderUpdateEvent(this[contextPropertyName]));
         }
 
         providerProto.connectedCallback = function (this: Provider) {
@@ -97,7 +97,7 @@ export default function createContext<T>(defaultValue?: T): Context<T> {
           },
           // Stores the provider instance's context value and dispatches an update event.
           set(newValue: T) {
-            if (notEqual(newValue, this[contextProperty])) {
+            if (notEqual(newValue, this[contextPropertyName])) {
               contextMap.set(this, newValue);
               this.dispatchEvent(new ContextProviderUpdateEvent(newValue));
             }
@@ -106,7 +106,7 @@ export default function createContext<T>(defaultValue?: T): Context<T> {
           configurable: true,
         };
 
-        Object.defineProperty(providerProto, contextProperty, propertyDescriptor);
+        Object.defineProperty(providerProto, contextPropertyName, propertyDescriptor);
       };
     },
 

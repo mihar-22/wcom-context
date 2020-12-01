@@ -1,7 +1,8 @@
-import { defineCE, expect, fixture, html, unsafeStatic, aTimeout, waitUntil } from '@open-wc/testing';
+import { defineCE, expect, fixture, html, unsafeStatic, aTimeout, waitUntil, elementUpdated } from '@open-wc/testing';
 import { FakeConsumer } from './FakeConsumer';
 import { fakeContext, fakeContextTwo } from './fakeContext';
 import { FakeProvider } from './FakeProvider';
+import { FakeLitConsumer } from './FakeLitConsumer';
 
 const fakeConsumerTag = unsafeStatic(defineCE(FakeConsumer));
 const fakeProviderTag = unsafeStatic(defineCE(FakeProvider));
@@ -100,5 +101,36 @@ describe('createContext', () => {
     
     provider.context = 50;
     expect(consumer.context).to.equal(50);
+  });
+  
+  it('should work with lit element without integrations', async () => {
+    const provider = await fixture<FakeProvider>(html`
+      <${fakeProviderTag}>
+        <fake-lit-consumer></fake-lit-consumer>
+      </${fakeProviderTag}>
+    `);
+
+    const consumer = provider.firstElementChild as FakeLitConsumer;
+    expect(consumer).to.be.instanceOf(FakeLitConsumer);
+   
+    // Update `contextTwo` from provider.
+    provider.contextTwo = 'chicken';
+    await elementUpdated(consumer);
+    expect(consumer.context).to.equal(fakeContext.defaultValue);
+    expect(consumer.contextTwo).to.equal('chicken');
+    expect(consumer).shadowDom.to.equal('<div>chicken - 10</div>');
+   
+    // Update `context` from provider.
+    provider.context = 20;
+    await elementUpdated(consumer);
+    expect(consumer.context).to.equal(20);
+    expect(consumer.contextTwo).to.equal('chicken');
+    expect(consumer).shadowDom.to.equal('<div>chicken - 20</div>');
+
+    // Update `context` prop directly from consumer (anti-pattern??).
+    consumer.context = 30;
+    await elementUpdated(consumer);
+    expect(consumer.context).to.equal(30);
+    expect(consumer).shadowDom.to.equal('<div>chicken - 30</div>');
   });
 });

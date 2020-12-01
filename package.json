@@ -13,8 +13,6 @@
   },
   "files": [
     "dist/",
-    "lit/",
-    "stencil/",
     "@types/"
   ],
   "scripts": {
@@ -26,8 +24,8 @@
     "test:watch": "wtr \"src/**/*.test.ts\" --watch"
   },
   "devDependencies": {
+    "@open-wc/semantic-dom-diff": "^0.19.3",
     "@open-wc/testing": "^2.5.32",
-    "@stencil/core": "^2.3.0",
     "@types/mocha": "^8.0.4",
     "@web/dev-server-esbuild": "^0.2.8",
     "@web/test-runner": "^0.9.13",

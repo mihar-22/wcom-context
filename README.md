@@ -164,6 +164,5 @@ class MyComponent {
 
 ## Related Packages
 
-- [`wc-bob`](https://github.com/mihar-22/wc-bob): CLI to analyze your web components and output 
-documentation, types and framework integrations.
+- [`wc-cli`](https://github.com/mihar-22/wc-cli): CLI tool to get your web component library ready for production.
 - [`wc-events`](https://github.com/mihar-22/wc-events): Event decorators and helpers for web components.

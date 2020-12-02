@@ -76,7 +76,7 @@ interface Context<T> {
 }
 ```
 
-1. Let's create out context...
+1. Let's create our context...
 
 ```ts
 import createContext from '@wcom/context';

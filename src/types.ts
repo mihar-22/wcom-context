@@ -8,7 +8,7 @@ export type PropertyDecorator<T> = (target: T, propertyKey: string) => void;
 export interface Context<T> {
   provide(): PropertyDecorator<ConnectableElement>
   consume(): PropertyDecorator<ConnectableElement>
-  defaultValue?: T
+  defaultValue: T
 }
 
 export interface Consumer extends HTMLElement {

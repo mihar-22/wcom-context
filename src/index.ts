@@ -22,7 +22,7 @@ import {
  * 
  * @param defaultValue - The initial value for this given context.
  */
-export default function createContext<T>(defaultValue?: T): Context<T> {
+export default function createContext<T>(defaultValue: T): Context<T> {
    // Private store of provider context values.
   const contextMap = new WeakMap<Provider, T>();
 

@@ -1,4 +1,4 @@
-export interface ConnectableElement extends HTMLElement {
+export interface ConnectableElement {
   connectedCallback?(): void
   disconnectedCallback?(): void
 }

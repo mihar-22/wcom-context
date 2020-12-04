@@ -220,7 +220,8 @@ export default function createContext<T>(
         };
 
         consumerProto.disconnectedCallback = function () {
-          (this as HTMLElement).dispatchEvent(new ContextConsumerDisconnectEvent());
+          const el = getElement?.(this) ?? this;
+          el.dispatchEvent(new ContextConsumerDisconnectEvent());
           if (isFunction(disconnectedCallback)) disconnectedCallback.call(this);
         };
       };

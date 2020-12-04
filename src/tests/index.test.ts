@@ -18,6 +18,7 @@ describe('createContext', () => {
     provider.context = 20;
     const consumer = provider.firstElementChild as FakeConsumer;
     expect(consumer.context).to.equal(20);
+    expect(consumer.contextCopy).to.equal(20);
     expect(consumer.contextTwo).to.equal(fakeContextTwo.defaultValue);
   });
 
@@ -45,11 +46,13 @@ describe('createContext', () => {
     providerA.context = 20;
     expect(providerB.context).to.equal(fakeContext.defaultValue);
     expect(consumer.context).to.equal(fakeContext.defaultValue);
+    expect(consumer.contextCopy).to.equal(fakeContext.defaultValue);
     
     providerB.context = 30;
     expect(providerA.context).to.equal(20);
     expect(providerB.context).to.equal(30);
     expect(consumer.context).to.equal(30);
+    expect(consumer.contextCopy).to.equal(30);
   });
 
   it('should disconnect when provider is disconnected', async () => {

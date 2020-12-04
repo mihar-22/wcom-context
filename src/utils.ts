@@ -17,6 +17,18 @@ export const notEqual = (value: unknown, old: unknown): boolean => {
   return old !== value && (old === old || value === value);
 };
 
+export interface DeferredPromise<ResolutionType = any> {
+  promise: Promise<void>,
+  resolve: (res: ResolutionType) => void;
+}
+
+export const createDeferredPromise = (): DeferredPromise => {
+  let resolve: () => void;
+  const promise = new Promise<void>((res) => { resolve = res; });
+  // @ts-ignore
+  return { promise, resolve };
+};
+
 export function fireEventAndRetry<T>(
   el: HTMLElement,
   event: CustomEvent<T>,

@@ -1,4 +1,4 @@
-import { fireEventAndRetry, isFunction, notEqual } from './utils';
+import { createDeferredPromise, fireEventAndRetry, isFunction, notEqual } from './utils';
 import { 
   ConsumerConnectEvent, 
   ConsumerConnectEventDetail, 
@@ -22,7 +22,10 @@ import {
  * 
  * @param defaultValue - The initial value for this given context.
  */
-export default function createContext<T>(defaultValue: T): Context<T> {
+export default function createContext<T>(
+  defaultValue: T,
+  getElement?: (ref: any) => HTMLElement,
+): Context<T> {
    // Private store of provider context values.
   const contextMap = new WeakMap<Provider, T>();
 
@@ -43,8 +46,8 @@ export default function createContext<T>(defaultValue: T): Context<T> {
     defaultValue,
     provide() {
       return function decorateContextProvider(providerProto, contextPropertyName) {
-        const { connectedCallback, disconnectedCallback } = providerProto;
-
+        const { connectedCallback, componentWillLoad, disconnectedCallback } = providerProto;
+        
         function onConsumerConnect(this: Provider, event: Event) {
           // Validate event was dispatched by a pairable consumer.
           if (!ContextConsumerConnectEvent.validate(event)) return;
@@ -57,15 +60,17 @@ export default function createContext<T>(defaultValue: T): Context<T> {
             onConnectToProvider, 
             onProviderUpdate,
           } = event.detail;
+          
+          const el = getElement?.(this) ?? this;
 
           // Add the consumer's `onProviderUpdate` callback as a listener to the
           // provider's context change event.
-          this.addEventListener(ProviderUpdateEvent.TYPE, onProviderUpdate);
+          el.addEventListener(ProviderUpdateEvent.TYPE, onProviderUpdate);
 
           const onDisconnectFromProvider = (event: Event) => {
             // Validate event was dispatched by a pairable consumer.
             if (!ContextConsumerDisconnectEvent.validate(event)) return;
-            this.removeEventListener(ProviderUpdateEvent.TYPE, onProviderUpdate);
+            el.removeEventListener(ProviderUpdateEvent.TYPE, onProviderUpdate);
           };
 
           // The consumer will add the callback as a listener to its own 
@@ -73,20 +78,37 @@ export default function createContext<T>(defaultValue: T): Context<T> {
           onConnectToProvider(onDisconnectFromProvider);
           
           // Set the consumer's context to the provider's initial (or default) value.
-          onProviderUpdate(new ContextProviderUpdateEvent(this[contextPropertyName]));
+          onProviderUpdate(new ContextProviderUpdateEvent(this[contextPropertyName]));  
+        }
+        
+        const CONNECTED = Symbol(`@wcom/${contextPropertyName}`);
+
+        function onConnected(this: Provider) {
+          if ((this as any)[CONNECTED]) return;
+          (this as any)[CONNECTED] = true;
+          const el = getElement?.(this) ?? this;
+          el.addEventListener(ConsumerConnectEvent.TYPE, onConsumerConnect);
         }
 
         providerProto.connectedCallback = function (this: Provider) {
           if (isFunction(connectedCallback)) connectedCallback.call(this);
-          this.addEventListener(ConsumerConnectEvent.TYPE, onConsumerConnect);
+          onConnected.call(this);
+        };
+       
+        // For stencil.
+        providerProto.componentWillLoad = function (this: Provider) {
+          if (isFunction(componentWillLoad)) componentWillLoad.call(this);
+          onConnected.call(this);
         };
 
         providerProto.disconnectedCallback = function (this: Provider) {
-          this.removeEventListener(ConsumerConnectEvent.TYPE, onConsumerConnect);
+          const el = getElement?.(this) ?? this;
+          el.removeEventListener(ConsumerConnectEvent.TYPE, onConsumerConnect);
 
           // Delete reference to privately stored context.
           contextMap.delete(this);
 
+          delete (this as any)[CONNECTED];
           if (isFunction(disconnectedCallback)) disconnectedCallback.call(this);
         };
 
@@ -112,34 +134,47 @@ export default function createContext<T>(defaultValue: T): Context<T> {
 
     consume() {
       return function decorateContextConsumer(consumerProto, contextPropertyName) {
-        const { connectedCallback, disconnectedCallback } = consumerProto;
+        const { connectedCallback, componentWillLoad, disconnectedCallback } = consumerProto;
 
-        consumerProto.connectedCallback = function (this: Consumer) {
-          if (isFunction(connectedCallback)) connectedCallback.call(this);
+        const CONNECTED = Symbol(`@wcom/${contextPropertyName}`);
+
+        async function onConnect(this: Consumer) {
+          if ((this as any)[CONNECTED]) return;
+          (this as any)[CONNECTED] = true;
 
           let stopLookingForProvider: () => void;
 
+          const { 
+            promise: waitForConnection, 
+            resolve: connected 
+          } = createDeferredPromise();
+
           const consumer = this;
+          const el = getElement?.(this) ?? this;
+
           const detail: ConsumerConnectEventDetail = {
             onConnectToProvider(onDisconnectFromProvider) {
               stopLookingForProvider();
-            
+
               // Some reason `once` doesn't work and this seems to be the only way all 
               // context providers disconnect properly.
               let off: () => void;
 
-              consumer.addEventListener(
+              el.addEventListener(
                 ConsumerDisconnectEvent.TYPE,
                 (e) => {
                   onDisconnectFromProvider(e);
                   off();
+                  delete (consumer as any)[CONNECTED];
                 },
               );
 
-              off = () => consumer.removeEventListener(
+              off = () => el.removeEventListener(
                 ConsumerDisconnectEvent.TYPE, 
                 onDisconnectFromProvider
               );
+              
+              connected(consumer);
             },
             // The event payload contains a listener to be added to the paired provider's 
             // context change event.
@@ -163,13 +198,25 @@ export default function createContext<T>(defaultValue: T): Context<T> {
           // that has been decorated by the provider factory generated within the
           // same `createContext` scope.
           const establishConnection = fireEventAndRetry(
-            this, 
+            el, 
             new ContextConsumerConnectEvent(detail),
             onCouldNotFindProvider,
           );
 
           stopLookingForProvider = establishConnection.stop;
           establishConnection.start();
+
+          return waitForConnection;
+        }
+
+        consumerProto.connectedCallback = function (this: Consumer) {
+          if (isFunction(connectedCallback)) connectedCallback.call(this);
+          onConnect.call(this);
+        };
+       
+        // For stencil.
+        consumerProto.componentWillLoad = function (this: Consumer) {
+          return onConnect.call(this).then(() => componentWillLoad?.call(this));
         };
 
         consumerProto.disconnectedCallback = function () {

@@ -1,13 +1,8 @@
-export interface ConnectableElement {
-  connectedCallback?(): void
-  disconnectedCallback?(): void
-}
-
 export type PropertyDecorator<T> = (target: T, propertyKey: string) => void;
 
 export interface Context<T> {
-  provide(): PropertyDecorator<ConnectableElement>
-  consume(): PropertyDecorator<ConnectableElement>
+  provide(): PropertyDecorator<any>
+  consume(): PropertyDecorator<any>
   defaultValue: T
 }
 

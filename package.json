@@ -13,7 +13,8 @@
   },
   "files": [
     "dist/",
-    "@types/"
+    "@types/",
+    "stencil/"
   ],
   "scripts": {
     "build": "rimraf dist && rimraf @types && npm run build:cjs && npm run build:esm",
@@ -26,6 +27,7 @@
   "devDependencies": {
     "@open-wc/semantic-dom-diff": "^0.19.3",
     "@open-wc/testing": "^2.5.32",
+    "@stencil/core": "^2.3.0",
     "@types/mocha": "^8.0.4",
     "@web/dev-server-esbuild": "^0.2.8",
     "@web/test-runner": "^0.9.13",

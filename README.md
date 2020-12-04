@@ -79,6 +79,7 @@ interface Context<T> {
 1. Let's create our context...
 
 ```ts
+// If using Stencil, import from '@wcom/context/stencil'.
 import createContext from '@wcom/context';
 
 export const myContext = createContext(10);
@@ -146,8 +147,9 @@ class MyComponent extends LitElement {
 
 ## Stencil Example
 
-The usage is exactly the same as above except you might want to trigger a re-render on changes,
-so set a `@State` decorator accordingly like so...
+The usage is exactly the same as above except you'll need to import from `@wcom/context/stencil`. In 
+addition, you might want to trigger a re-render on changes, so set a `@State` decorator 
+accordingly like so...
 
 ```ts
 import { myContext } from './context';

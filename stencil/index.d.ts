@@ -1,1 +1,4 @@
-export * from '../dist/esm/integrations/stencil';
+import createContext from '../@types/integrations/stencil';
+
+export * from '../@types/integrations/stencil';
+export default createContext;

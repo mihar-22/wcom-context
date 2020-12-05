@@ -20,9 +20,9 @@
 
 This library enables data to be passed down component trees without having to pass props down 
 manually. This library is expected to be used with [TypeScript](https://www.typescriptlang.org), 
-make sure to set `experimentalDecorators` to `true` in `tsconfig.json`. It can be easily used 
-with `lit-element`, `@stencil/core` or whatever web component library/framework you like 
-(examples below).
+make sure to set `experimentalDecorators` to `true` in `tsconfig.json`. 
+
+_This library currently does not work with Stencil, any PR is welcomed to add support!_
 
 ## Install
 
@@ -79,7 +79,6 @@ interface Context<T> {
 1. Let's create our context...
 
 ```ts
-// If using Stencil, import from '@wcom/context/stencil'.
 import createContext from '@wcom/context';
 
 export const myContext = createContext(10);
@@ -141,25 +140,6 @@ class MyComponent extends LitElement {
   @myContext.consume()
   someContext = myContext.defaultValue;
   
-  // ...
-}
-```
-
-## Stencil Example
-
-The usage is exactly the same as above except you'll need to import from `@wcom/context/stencil`. In 
-addition, you might want to trigger a re-render on changes, so set a `@State` decorator 
-accordingly like so...
-
-```ts
-import { myContext } from './context';
-import { State } from '@stencil/core';
-
-class MyComponent {
-  @State()
-  @myContext.consume()
-  someContext = myContext.defaultValue;
-
   // ...
 }
 ```

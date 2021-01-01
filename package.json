@@ -7,9 +7,9 @@
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "types": "@types/",
-  "homepage": "https://github.com/mihar-22/wc-context",
+  "homepage": "https://github.com/wcom-js/context",
   "bugs": {
-    "url": "https://github.com/mihar-22/wc-context"
+    "url": "https://github.com/wcom-js/context/issues"
   },
   "files": [
     "dist/",

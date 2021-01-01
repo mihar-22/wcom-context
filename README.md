@@ -7,10 +7,10 @@
 
 [package]: https://www.npmjs.com/package/@wcom/context
 [package-badge]: https://img.shields.io/npm/v/@wcom/context
-[license]: https://github.com/mihar-22/wc-context/blob/master/LICENSE
-[license-badge]: https://img.shields.io/github/license/mihar-22/wc-context
-[coverage]: https://codecov.io/github/mihar-22/wc-context
-[coverage-badge]: https://img.shields.io/codecov/c/github/mihar-22/wc-context.svg
+[license]: https://github.com/wcom-js/context/blob/main/LICENSE
+[license-badge]: https://img.shields.io/github/license/wcom-js/context
+[coverage]: https://codecov.io/github/wcom-js/context
+[coverage-badge]: https://img.shields.io/codecov/c/github/wcom-js/context.svg
 [semantic-release]: https://github.com/semantic-release/semantic-release
 [semantic-release-badge]: https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg
 
@@ -22,7 +22,7 @@ This library enables data to be passed down component trees without having to pa
 manually. This library is expected to be used with [TypeScript](https://www.typescriptlang.org), 
 make sure to set `experimentalDecorators` to `true` in `tsconfig.json`. 
 
-_This library currently does not work with Stencil, any PR is welcomed to add support!_
+_This library currently does not work with Stencil anymore, any PR is welcomed to add support!_
 
 ## Install
 
@@ -143,9 +143,3 @@ class MyComponent extends LitElement {
   // ...
 }
 ```
-
-## Related Packages
-
-- [`wc-create-app`](https://github.com/mihar-22/wc-create-app): Set up a modern web component library by running one command.
-- [`wc-cli`](https://github.com/mihar-22/wc-cli): CLI tool to get your web component library ready for production.
-- [`wc-events`](https://github.com/mihar-22/wc-events): Event decorators and helpers for web components.

@@ -2,7 +2,7 @@
   "name": "@wcom/context",
   "version": "0.0.0",
   "license": "MIT",
-  "author": "Rahim Alwer <rahim_alwer@hotmail.com>",
+  "author": "Rahim Alwer <rahim_alwer@outlook.com>",
   "description": "Pass props down web component trees easily.",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",

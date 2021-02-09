@@ -1,4 +1,4 @@
-abstract class SelfValidatingEvent<T extends any = any> extends CustomEvent<T> {
+export abstract class SelfValidatingEvent<T extends any = any> extends CustomEvent<T> {
   static validate(event: SelfValidatingEvent): event is SelfValidatingEvent {
     return event instanceof this;
   }

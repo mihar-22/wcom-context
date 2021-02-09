@@ -1,12 +1,12 @@
 export const isNull = (input: any): input is null => input === null;
 export const isUndefined = (input: any): input is undefined => typeof input === 'undefined';
 
-export const isNullOrUndefined = (
+export const isNil = (
   input: any,
 ): input is null | undefined => isNull(input) || isUndefined(input);
 
 export const getConstructor = (input: any): object | undefined => (
-  !isNullOrUndefined(input) ? input.constructor : undefined
+  !isNil(input) ? input.constructor : undefined
 );
 
 export const isFunction = (input: any): input is Function => getConstructor(input) === Function;

@@ -12,6 +12,8 @@ import {
   ProviderPropertyDescriptor,
 } from './types';
 
+export * from './types';
+
 /**
  * Creates a new context that enables data to be passed down the component tree without having 
  * to pass props down manually. Each context can only have a single provider which is responsible 

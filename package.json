@@ -6,14 +6,12 @@
   "description": "Pass props down web component trees easily.",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
-  "types": "@types/",
   "homepage": "https://github.com/mihar-22/wcom-context",
   "bugs": {
     "url": "https://github.com/mihar-22/wcom-context/issues"
   },
   "files": [
-    "dist/",
-    "@types/"
+    "dist/"
   ],
   "scripts": {
     "build": "npm run clean && npm run build:cjs && npm run build:esm",

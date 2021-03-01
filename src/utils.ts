@@ -1,15 +1,15 @@
 export const isNull = (input: any): input is null => input === null;
-export const isUndefined = (input: any): input is undefined => typeof input === 'undefined';
+export const isUndefined = (input: any): input is undefined =>
+  typeof input === "undefined";
 
-export const isNil = (
-  input: any,
-): input is null | undefined => isNull(input) || isUndefined(input);
+export const isNil = (input: any): input is null | undefined =>
+  isNull(input) || isUndefined(input);
 
-export const getConstructor = (input: any): object | undefined => (
-  !isNil(input) ? input.constructor : undefined
-);
+export const getConstructor = (input: any): object | undefined =>
+  !isNil(input) ? input.constructor : undefined;
 
-export const isFunction = (input: any): input is Function => getConstructor(input) === Function;
+export const isFunction = (input: any): input is Function =>
+  getConstructor(input) === Function;
 
 // Borrowed from `lit-element`.
 export const notEqual = (value: unknown, old: unknown): boolean => {
@@ -22,7 +22,7 @@ export function fireEventAndRetry<T>(
   event: CustomEvent<T>,
   onFail?: () => void,
   frequency = 100,
-  maxRetries = 10,
+  maxRetries = 10
 ) {
   let interval: number;
   let attempt = 0;
@@ -38,7 +38,7 @@ export function fireEventAndRetry<T>(
 
     if (attempt === maxRetries) {
       onStop();
-      onFail?.();
+      onFail && onFail();
       return;
     }
 
@@ -53,6 +53,6 @@ export function fireEventAndRetry<T>(
     },
     stop() {
       onStop();
-    }
+    },
   };
 }

@@ -1,7 +1,13 @@
-import { customElement, html, internalProperty, LitElement, property } from 'lit-element';
-import { fakeContext, fakeContextTwo } from './fakeContext';
+import {
+  customElement,
+  html,
+  internalProperty,
+  LitElement,
+  property,
+} from "lit-element";
+import { fakeContext, fakeContextTwo } from "./fakeContext";
 
-@customElement('fake-lit-consumer')
+@customElement("fake-lit-consumer")
 export class FakeLitConsumer extends LitElement {
   @property()
   @fakeContext.consume()
@@ -11,7 +17,12 @@ export class FakeLitConsumer extends LitElement {
   @fakeContextTwo.consume()
   contextTwo = fakeContextTwo.defaultValue;
 
+  @fakeContextTwo.consume({ transform: (v) => `${v}Transformed ` })
+  transformedContext = fakeContextTwo.defaultValue;
+
   render() {
-    return html`<div>${this.contextTwo} - ${this.context}</div>`
+    return html`<div>
+      ${this.contextTwo} - ${this.context} - ${this.transformedContext}
+    </div>`;
   }
 }

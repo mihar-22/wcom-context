@@ -1,29 +1,29 @@
-import { fireEventAndRetry, isFunction, notEqual } from './utils';
-import { 
-  ConsumerConnectEvent, 
-  ConsumerConnectEventDetail, 
-  ConsumerDisconnectEvent, 
+import { fireEventAndRetry, isFunction, notEqual } from "./utils";
+import {
+  ConsumerConnectEvent,
+  ConsumerConnectEventDetail,
+  ConsumerDisconnectEvent,
   ProviderUpdateEvent,
-} from './events';
-import { 
+} from "./events";
+import {
   Context,
   Consumer,
   Provider,
   ProviderPropertyDescriptor,
-} from './types';
+} from "./types";
 
 /**
- * Creates a new context that enables data to be passed down the component tree without having 
- * to pass props down manually. Each context can only have a single provider which is responsible 
- * for updating the current value, however there can be many consumers who listen for changes 
- * to the current context. A context can be any data type such as a string, boolean, array, object 
- * etc. When updating an array or object make sure to create a new one instead of using methods like 
+ * Creates a new context that enables data to be passed down the component tree without having
+ * to pass props down manually. Each context can only have a single provider which is responsible
+ * for updating the current value, however there can be many consumers who listen for changes
+ * to the current context. A context can be any data type such as a string, boolean, array, object
+ * etc. When updating an array or object make sure to create a new one instead of using methods like
  * push or assigning a key to a value.
- * 
+ *
  * @param defaultValue - The initial value for this given context.
  */
 export function createContext<T>(defaultValue: T): Context<T> {
-   // Private store of provider context values.
+  // Private store of provider context values.
   const contextMap = new WeakMap<Provider, T>();
 
   // Privately declared events help context consumers and providers identify one another.
@@ -42,9 +42,12 @@ export function createContext<T>(defaultValue: T): Context<T> {
   const context: Context<T> = {
     defaultValue,
     provide() {
-      return function decorateContextProvider(providerProto, contextPropertyName) {
+      return function decorateContextProvider(
+        providerProto,
+        contextPropertyName
+      ) {
         const { connectedCallback, disconnectedCallback } = providerProto;
-        
+
         function onConsumerConnect(this: Provider, event: Event) {
           // Validate event was dispatched by a pairable consumer.
           if (!ContextConsumerConnectEvent.validate(event)) return;
@@ -53,11 +56,8 @@ export function createContext<T>(defaultValue: T): Context<T> {
           // context providers.
           event.stopImmediatePropagation();
 
-          const {
-            onConnectToProvider, 
-            onProviderUpdate,
-          } = event.detail;
-          
+          const { onConnectToProvider, onProviderUpdate } = event.detail;
+
           // Add the consumer's `onProviderUpdate` callback as a listener to the
           // provider's context change event.
           this.addEventListener(ProviderUpdateEvent.TYPE, onProviderUpdate);
@@ -65,15 +65,20 @@ export function createContext<T>(defaultValue: T): Context<T> {
           const onDisconnectFromProvider = (event: Event) => {
             // Validate event was dispatched by a pairable consumer.
             if (!ContextConsumerDisconnectEvent.validate(event)) return;
-            this.removeEventListener(ProviderUpdateEvent.TYPE, onProviderUpdate);
+            this.removeEventListener(
+              ProviderUpdateEvent.TYPE,
+              onProviderUpdate
+            );
           };
 
-          // The consumer will add the callback as a listener to its own 
+          // The consumer will add the callback as a listener to its own
           // `ContextConsumerDisconnectEvent`.
           onConnectToProvider(onDisconnectFromProvider);
-          
+
           // Set the consumer's context to the provider's initial (or default) value.
-          onProviderUpdate(new ContextProviderUpdateEvent(this[contextPropertyName]));  
+          onProviderUpdate(
+            new ContextProviderUpdateEvent(this[contextPropertyName])
+          );
         }
 
         providerProto.connectedCallback = function (this: Provider) {
@@ -82,7 +87,10 @@ export function createContext<T>(defaultValue: T): Context<T> {
         };
 
         providerProto.disconnectedCallback = function (this: Provider) {
-          this.removeEventListener(ConsumerConnectEvent.TYPE, onConsumerConnect);
+          this.removeEventListener(
+            ConsumerConnectEvent.TYPE,
+            onConsumerConnect
+          );
 
           // Delete reference to privately stored context.
           contextMap.delete(this);
@@ -106,12 +114,21 @@ export function createContext<T>(defaultValue: T): Context<T> {
           configurable: true,
         };
 
-        Object.defineProperty(providerProto, contextPropertyName, propertyDescriptor);
+        Object.defineProperty(
+          providerProto,
+          contextPropertyName,
+          propertyDescriptor
+        );
       };
     },
 
-    consume() {
-      return function decorateContextConsumer(consumerProto, contextPropertyName) {
+    consume(options) {
+      const transform = (options && options.transform) || ((v) => v);
+
+      return function decorateContextConsumer(
+        consumerProto,
+        contextPropertyName
+      ) {
         const { connectedCallback, disconnectedCallback } = consumerProto;
 
         function onConnectToProvider(this: Consumer) {
@@ -123,31 +140,29 @@ export function createContext<T>(defaultValue: T): Context<T> {
             onConnectToProvider(onDisconnectFromProvider) {
               stopLookingForProvider();
 
-              // Some reason `once` doesn't work and this seems to be the only way all 
+              // Some reason `once` doesn't work and this seems to be the only way all
               // context providers disconnect properly.
               let off: () => void;
 
-              consumer.addEventListener(
-                ConsumerDisconnectEvent.TYPE,
-                (e) => {
-                  onDisconnectFromProvider(e);
-                  off();
-                },
-              );
+              consumer.addEventListener(ConsumerDisconnectEvent.TYPE, (e) => {
+                onDisconnectFromProvider(e);
+                off();
+              });
 
-              off = () => consumer.removeEventListener(
-                ConsumerDisconnectEvent.TYPE, 
-                onDisconnectFromProvider
-              );
+              off = () =>
+                consumer.removeEventListener(
+                  ConsumerDisconnectEvent.TYPE,
+                  onDisconnectFromProvider
+                );
             },
-            // The event payload contains a listener to be added to the paired provider's 
+            // The event payload contains a listener to be added to the paired provider's
             // context change event.
             onProviderUpdate: (event: Event) => {
               // Validate event was dispatched by a pairable provider.
               if (!ContextProviderUpdateEvent.validate(event)) return;
 
               // Update consumer context. The property decorator will handle the equality validation.
-              this[contextPropertyName] = event.detail;
+              this[contextPropertyName] = transform(event.detail);
             },
           };
 
@@ -162,9 +177,9 @@ export function createContext<T>(defaultValue: T): Context<T> {
           // that has been decorated by the provider factory generated within the
           // same `createContext` scope.
           const establishConnection = fireEventAndRetry(
-            this, 
+            this,
             new ContextConsumerConnectEvent(detail),
-            onCouldNotFindProvider,
+            onCouldNotFindProvider
           );
 
           stopLookingForProvider = establishConnection.stop;

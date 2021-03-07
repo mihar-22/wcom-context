@@ -10,10 +10,10 @@ export class FakeProvider extends HTMLElement {
   constructor() {
     super();
 
-    const template = document.createElement('template');
+    const template = document.createElement("template");
     template.innerText = `<div>&#x3C;slot&#x3E;&#x3C;/slot&#x3E;</div>`;
-      
-    this.attachShadow({ mode: 'open' });
+
+    this.attachShadow({ mode: "open" });
     this.appendChild(template.content.cloneNode(true));
   }
 }

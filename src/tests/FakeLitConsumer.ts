@@ -17,7 +17,7 @@ export class FakeLitConsumer extends LitElement {
   @fakeContextTwo.consume()
   contextTwo = fakeContextTwo.defaultValue;
 
-  @fakeContextTwo.consume({ transform: (v) => `${v}Transformed ` })
+  @fakeContextTwo.consume({ transform: (v) => `${v}Transformed` })
   transformedContext = fakeContextTwo.defaultValue;
 
   render() {

@@ -109,13 +109,12 @@ export function contextRecordProvider(
         const isDerived = isDerivedContext(record[prop]);
         const derivedCtx = !isDerived
           ? undefined
-          : (record[prop] as DerivedContext<unknown, unknown>);
+          : (record[prop] as DerivedContext<unknown>);
 
         Object.defineProperty(context, prop, {
           get: !isDerived
             ? () => provider[propName]
-            : () =>
-                derivedCtx!.derivation(provider[derivedCtx!.derivedFromKey]),
+            : () => provider[derivedCtx!.key],
           set: !isDerived
             ? (newValue: unknown) => {
                 provider[propName] = newValue;

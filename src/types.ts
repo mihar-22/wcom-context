@@ -9,16 +9,18 @@ export interface ContextOptions<T> {
   transform: (value: T) => T;
 }
 
+export type StopWatching = () => void;
+
 export interface Context<T> {
   provide(): PropertyDecorator<any>;
   consume(options?: ContextOptions<T>): PropertyDecorator<any>;
+  watch(el: HTMLElement, handle: (newValue: T) => void): StopWatching;
   defaultValue: T;
 }
 
-export interface DerivedContext<T, R> extends Omit<Context<R>, "provide"> {
+export interface DerivedContext<R> extends Omit<Context<R>, "provide"> {
+  key: symbol;
   provide(): ClassDecorator;
-  derivedFromKey: symbol;
-  derivation: (value: T) => R;
 }
 
 export interface Consumer extends HTMLElement {

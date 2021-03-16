@@ -22,38 +22,34 @@ import {
 export function derivedContext<T, R>(
   context: Context<T>,
   derivation: (value: T) => R
-): DerivedContext<T, R> {
-  const CONSUME_KEY = (Symbol() as unknown) as string;
-  const PROVIDE_KEY = Symbol();
+): DerivedContext<R> {
+  const key = Symbol();
   const defaultValue = derivation(context.defaultValue);
   const derivedContext = createContext(defaultValue);
 
   return {
-    defaultValue,
-    derivation,
-    derivedFromKey: PROVIDE_KEY,
-    consume() {
-      return function consumeDerivedContext(consumerProto, propertyKey) {
-        let currentValue = defaultValue;
-        Object.defineProperty(consumerProto, CONSUME_KEY, {
-          get() {
-            return currentValue;
-          },
-          set(newValue: T) {
-            currentValue = derivation(newValue);
-            this[propertyKey] = currentValue;
-          },
-          enumerable: false,
-          configurable: false,
-        });
-
-        context.consume()(consumerProto, CONSUME_KEY);
-        derivedContext.consume()(consumerProto, propertyKey);
-      };
-    },
+    key,
+    ...derivedContext,
     provide() {
-      return function provideDerivedContext(providerProto) {
-        context.provide()(providerProto, (PROVIDE_KEY as unknown) as string);
+      return function provideDerivedContext(ctor: Function) {
+        const proto = isFunction(ctor) ? ctor.prototype : ctor;
+        const { connectedCallback, disconnectedCallback } = proto;
+
+        let stop: () => void;
+
+        proto.connectedCallback = function () {
+          stop = context.watch(this, (newValue) => {
+            this[key] = derivation(newValue);
+          });
+          if (isFunction(connectedCallback)) connectedCallback.call(this);
+        };
+
+        proto.disconnectedCallback = function () {
+          stop();
+          if (isFunction(disconnectedCallback)) disconnectedCallback.call(this);
+        };
+
+        derivedContext.provide()(proto, (key as unknown) as string);
       };
     },
   };
@@ -242,6 +238,24 @@ export function createContext<T>(defaultValue: T): Context<T> {
           this.dispatchEvent(new ContextConsumerDisconnectEvent());
           if (isFunction(disconnectedCallback)) disconnectedCallback.call(this);
         };
+      };
+    },
+
+    watch(el, handle) {
+      handle(
+        contextMap.has(el as Provider)
+          ? contextMap.get(el as Provider)!
+          : defaultValue
+      );
+
+      const handleUpdate = (e: Event) => {
+        if (!ContextProviderUpdateEvent.validate(e)) return;
+        handle(e.detail);
+      };
+
+      el.addEventListener(ContextProviderUpdateEvent.TYPE, handleUpdate);
+      return () => {
+        el.removeEventListener(ContextProviderUpdateEvent.TYPE, handleUpdate);
       };
     },
   };

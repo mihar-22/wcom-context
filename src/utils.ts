@@ -21,8 +21,8 @@ export const notEqual = (value: unknown, old: unknown): boolean => {
 
 export const isDerivedContext = (
   context: unknown
-): context is DerivedContext<unknown, unknown> =>
-  !isUndefined((context as { providerKey?: symbol }).providerKey);
+): context is DerivedContext<unknown> =>
+  !isUndefined((context as { key?: symbol }).key);
 
 export function fireEventAndRetry<T>(
   el: HTMLElement,

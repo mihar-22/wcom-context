@@ -18,14 +18,8 @@
     "target": "ESNext",
     "declaration": true,
     "sourceMap": true,
-    "outDir": "dist",
+    "outDir": "dist"
   },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "node_modules/",
-    "src/tests/",
-    "src/integrations/tests/"
-  ]
+  "include": ["src"],
+  "exclude": ["node_modules/", "src/tests/", "src/integrations/tests/"]
 }

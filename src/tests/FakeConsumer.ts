@@ -1,4 +1,4 @@
-import { fakeContext, fakeContextTwo } from "./fakeContext";
+import { fakeContext, fakeContextRecord, fakeContextTwo } from "./fakeContext";
 
 export class FakeConsumer extends HTMLElement {
   @fakeContext.consume()
@@ -12,4 +12,10 @@ export class FakeConsumer extends HTMLElement {
 
   @fakeContextTwo.consume({ transform: (v) => `${v}Transformed` })
   transformedContext = fakeContextTwo.defaultValue;
+
+  @fakeContextRecord.ctxA.consume()
+  ctxA = fakeContextRecord.ctxA.defaultValue;
+
+  @fakeContextRecord.ctxB.consume()
+  ctxB = fakeContextRecord.ctxB.defaultValue;
 }

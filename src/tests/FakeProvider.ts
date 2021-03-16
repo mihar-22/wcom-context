@@ -1,11 +1,23 @@
-import { fakeContext, fakeContextTwo } from "./fakeContext";
+import {
+  contextRecordAccesssor,
+  ContextRecordProvider,
+  provideContextRecord,
+} from "../context-record";
+import { fakeContext, fakeContextRecord, fakeContextTwo } from "./fakeContext";
 
+@provideContextRecord(fakeContextRecord)
 export class FakeProvider extends HTMLElement {
   @fakeContext.provide()
   context = fakeContext.defaultValue;
 
   @fakeContextTwo.provide()
   contextTwo = fakeContextTwo.defaultValue;
+
+  @contextRecordAccesssor(fakeContextRecord)
+  contextAccessor!: ContextRecordProvider<{
+    ctxA: number;
+    ctxB: string;
+  }>;
 
   constructor() {
     super();

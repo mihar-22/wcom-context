@@ -165,3 +165,27 @@ describe("createContext", () => {
     );
   });
 });
+
+describe("provideContextRecord", () => {
+  it("should provide context record", async () => {
+    const provider = await fixture<FakeProvider>(html`
+      <${fakeProviderTag}>
+        <${fakeConsumerTag}></${fakeConsumerTag}>
+      </${fakeProviderTag}>
+    `);
+
+    const consumer = provider.firstElementChild as FakeConsumer;
+
+    (provider as any).ctxA = 12.5;
+    expect(consumer.ctxA).to.equal(12.5);
+
+    provider.contextAccessor.ctxA = 20;
+    expect(consumer.ctxA).to.equal(20);
+
+    (provider as any).ctxB = "soup";
+    expect(consumer.ctxB).to.equal("soup");
+
+    provider.contextAccessor.ctxB = "chicken";
+    expect(consumer.ctxB).to.equal("chicken");
+  });
+});

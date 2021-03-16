@@ -4,8 +4,9 @@
   "license": "MIT",
   "author": "Rahim Alwer <rahim_alwer@outlook.com>",
   "description": "Pass props down web component trees easily.",
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
   "homepage": "https://github.com/mihar-22/wcom-context",
   "bugs": {
     "url": "https://github.com/mihar-22/wcom-context/issues"
@@ -14,9 +15,8 @@
     "dist/"
   ],
   "scripts": {
-    "build": "npm run clean && npm run build:cjs && npm run build:esm",
-    "build:cjs": "tsc -m commonjs --outDir dist/cjs",
-    "build:esm": "tsc -m es2015 --outDir dist/esm",
+    "build": "npm run clean && npm run build:esm",
+    "build:esm": "tsc -m es2015 --outDir dist",
     "clean": "rimraf dist",
     "release": "npx semantic-release --branches main",
     "test": "wtr \"src/**/*.test.ts\" --coverage",

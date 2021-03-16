@@ -22,22 +22,29 @@ import {
 export function derivedContext<T, R>(
   context: Context<T>,
   derivation: (value: T) => R
-): DerivedContext<R> {
+): DerivedContext<T, R> {
   const CONSUME_KEY = (Symbol() as unknown) as string;
-  const PROVIDE_KEY = (Symbol() as unknown) as string;
+  const PROVIDE_KEY = Symbol();
   const defaultValue = derivation(context.defaultValue);
   const derivedContext = createContext(defaultValue);
 
   return {
     defaultValue,
+    derivation,
+    derivedFromKey: PROVIDE_KEY,
     consume() {
       return function consumeDerivedContext(consumerProto, propertyKey) {
+        let currentValue = defaultValue;
         Object.defineProperty(consumerProto, CONSUME_KEY, {
-          set(newValue: T) {
-            this[propertyKey] = derivation(newValue);
+          get() {
+            return currentValue;
           },
-          enumerable: true,
-          configurable: true,
+          set(newValue: T) {
+            currentValue = derivation(newValue);
+            this[propertyKey] = currentValue;
+          },
+          enumerable: false,
+          configurable: false,
         });
 
         context.consume()(consumerProto, CONSUME_KEY);
@@ -46,16 +53,7 @@ export function derivedContext<T, R>(
     },
     provide() {
       return function provideDerivedContext(providerProto) {
-        Object.defineProperty(providerProto, CONSUME_KEY, {
-          set(newValue: T) {
-            this[PROVIDE_KEY] = newValue;
-          },
-          enumerable: true,
-          configurable: true,
-        });
-
-        context.provide()(providerProto, CONSUME_KEY);
-        derivedContext.provide()(providerProto, PROVIDE_KEY);
+        context.provide()(providerProto, (PROVIDE_KEY as unknown) as string);
       };
     },
   };

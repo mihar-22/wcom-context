@@ -1,5 +1,5 @@
-import { Context } from "./types";
-import { isFunction } from "./utils";
+import { Context, DerivedContext } from "./types";
+import { isDerivedContext, isFunction } from "./utils";
 
 export type ContextRecord<R extends Record<string, unknown>> = {
   readonly [P in keyof R]: Context<R[P]>;
@@ -15,7 +15,7 @@ export type ContextRecordProvider<R extends Record<string, unknown>> = {
  * the given record.
  *
  * In order to access the context properties you can either access them directly within your
- * class `this.myCtx`, or you can use `contextRecordAccessor` provided by this library if you'd
+ * class `this.myCtx`, or you can use `contextRecordProvider` provided by this library if you'd
  * like to access it from a single property such as `this.context.myContext`.
  *
  * @param record - The context record.
@@ -67,7 +67,7 @@ export function provideContextRecord(
  *   ContextRecord,
  *   ContextRecordProvider,
  *   provideContextRecord,
- *   contextRecordAccessor,
+ *   contextRecordProvider,
  * } from '@wcom/context';
  *
  * interface MyContextProps {
@@ -85,12 +85,12 @@ export function provideContextRecord(
  *
  * \@provideContextRecord(contextRecord)
  * class MyComponent {
- *   \@contextRecordAccessor(contextRecord)
+ *   \@contextRecordProvider(contextRecord)
  *   context!: ContextRecordProvider<MyContextProps>;
  * }
  * ```
  */
-export function contextRecordAccesssor(
+export function contextRecordProvider(
   record: ContextRecord<any>,
   transformProviderName = (prop: string) => prop
 ) {
@@ -105,13 +105,22 @@ export function contextRecordAccesssor(
 
       Object.keys(record).forEach((prop) => {
         const propName = transformProviderName(prop);
+
+        const isDerived = isDerivedContext(record[prop]);
+        const derivedCtx = !isDerived
+          ? undefined
+          : (record[prop] as DerivedContext<unknown, unknown>);
+
         Object.defineProperty(context, prop, {
-          get() {
-            return provider[propName];
-          },
-          set(newValue: unknown) {
-            provider[propName] = newValue;
-          },
+          get: !isDerived
+            ? () => provider[propName]
+            : () =>
+                derivedCtx!.derivation(provider[derivedCtx!.derivedFromKey]),
+          set: !isDerived
+            ? (newValue: unknown) => {
+                provider[propName] = newValue;
+              }
+            : undefined,
           enumerable: true,
           configurable: true,
         });

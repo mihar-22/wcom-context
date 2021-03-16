@@ -1,3 +1,5 @@
+import { DerivedContext } from "./types";
+
 export const isNull = (input: any): input is null => input === null;
 export const isUndefined = (input: any): input is undefined =>
   typeof input === "undefined";
@@ -16,6 +18,11 @@ export const notEqual = (value: unknown, old: unknown): boolean => {
   // This ensures (old==NaN, value==NaN) always returns false.
   return old !== value && (old === old || value === value);
 };
+
+export const isDerivedContext = (
+  context: unknown
+): context is DerivedContext<unknown, unknown> =>
+  !isUndefined((context as { providerKey?: symbol }).providerKey);
 
 export function fireEventAndRetry<T>(
   el: HTMLElement,

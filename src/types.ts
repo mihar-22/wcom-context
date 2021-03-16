@@ -15,8 +15,10 @@ export interface Context<T> {
   defaultValue: T;
 }
 
-export interface DerivedContext<T> extends Omit<Context<T>, "provide"> {
+export interface DerivedContext<T, R> extends Omit<Context<R>, "provide"> {
   provide(): ClassDecorator;
+  derivedFromKey: symbol;
+  derivation: (value: T) => R;
 }
 
 export interface Consumer extends HTMLElement {

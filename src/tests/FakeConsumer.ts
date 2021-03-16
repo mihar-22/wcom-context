@@ -1,4 +1,9 @@
-import { fakeContext, fakeContextRecord, fakeContextTwo } from "./fakeContext";
+import {
+  fakeContext,
+  fakeContextRecord,
+  fakeContextTwo,
+  fakeDerivedContext,
+} from "./fakeContext";
 
 export class FakeConsumer extends HTMLElement {
   @fakeContext.consume()
@@ -18,4 +23,10 @@ export class FakeConsumer extends HTMLElement {
 
   @fakeContextRecord.ctxB.consume()
   ctxB = fakeContextRecord.ctxB.defaultValue;
+
+  @fakeContextRecord.ctxC.consume()
+  ctxC = fakeContextRecord.ctxC.defaultValue;
+
+  @fakeDerivedContext.consume()
+  derivedCtx = fakeDerivedContext.defaultValue;
 }

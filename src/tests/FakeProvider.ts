@@ -3,8 +3,14 @@ import {
   ContextRecordProvider,
   provideContextRecord,
 } from "../context-record";
-import { fakeContext, fakeContextRecord, fakeContextTwo } from "./fakeContext";
+import {
+  fakeContext,
+  fakeContextRecord,
+  fakeContextTwo,
+  fakeDerivedContext,
+} from "./fakeContext";
 
+@fakeDerivedContext.provide()
 @provideContextRecord(fakeContextRecord)
 export class FakeProvider extends HTMLElement {
   @fakeContext.provide()

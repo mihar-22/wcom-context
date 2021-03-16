@@ -16,14 +16,19 @@ import { FakeLitConsumer } from "./FakeLitConsumer";
 const fakeConsumerTag = unsafeStatic(defineCE(FakeConsumer));
 const fakeProviderTag = unsafeStatic(defineCE(FakeProvider));
 
-describe("createContext", () => {
-  it("should connect to provider", async () => {
-    const provider = await fixture<FakeProvider>(html`
+async function buildFixture(): Promise<[FakeProvider, FakeConsumer]> {
+  const provider = await fixture<FakeProvider>(html`
       <${fakeProviderTag}>
         <${fakeConsumerTag}></${fakeConsumerTag}>
       </${fakeProviderTag}>
     `);
+  const consumer = provider.firstElementChild as FakeConsumer;
+  return [provider, consumer];
+}
 
+describe("createContext", () => {
+  it("should connect to provider", async () => {
+    const [provider] = await buildFixture();
     provider.context = 20;
     const consumer = provider.firstElementChild as FakeConsumer;
     expect(consumer.context).to.equal(20);
@@ -65,13 +70,7 @@ describe("createContext", () => {
   });
 
   it("should disconnect when provider is disconnected", async () => {
-    const provider = await fixture<FakeProvider>(html`
-      <${fakeProviderTag}>
-        <${fakeConsumerTag}></${fakeConsumerTag}>
-      </${fakeProviderTag}>
-    `);
-
-    const consumer = provider.firstElementChild as FakeConsumer;
+    const [provider, consumer] = await buildFixture();
 
     provider.remove();
     await waitUntil(() => !provider.isConnected);
@@ -81,13 +80,7 @@ describe("createContext", () => {
   });
 
   it("should disconnect when consumer is disconnected", async () => {
-    const provider = await fixture<FakeProvider>(html`
-      <${fakeProviderTag}>
-        <${fakeConsumerTag}></${fakeConsumerTag}>
-      </${fakeProviderTag}>
-    `);
-
-    const consumer = provider.firstElementChild as FakeConsumer;
+    const [provider, consumer] = await buildFixture();
 
     consumer.remove();
     await waitUntil(() => !consumer.isConnected);
@@ -97,26 +90,14 @@ describe("createContext", () => {
   });
 
   it("should transform context", async () => {
-    const provider = await fixture<FakeProvider>(html`
-      <${fakeProviderTag}>
-        <${fakeConsumerTag}></${fakeConsumerTag}>
-      </${fakeProviderTag}>
-    `);
-
-    const consumer = provider.firstElementChild as FakeConsumer;
+    const [provider, consumer] = await buildFixture();
     expect(consumer.transformedContext).to.equal("applesTransformed");
     provider.contextTwo = "chicken";
     expect(consumer.transformedContext).to.equal("chickenTransformed");
   });
 
   it("should reconnect to same provider", async () => {
-    const provider = await fixture<FakeProvider>(html`
-      <${fakeProviderTag}>
-        <${fakeConsumerTag}></${fakeConsumerTag}>
-      </${fakeProviderTag}>
-    `);
-
-    const consumer = provider.firstElementChild as FakeConsumer;
+    const [provider, consumer] = await buildFixture();
 
     consumer.remove();
     await waitUntil(() => !consumer.isConnected);
@@ -168,13 +149,7 @@ describe("createContext", () => {
 
 describe("provideContextRecord", () => {
   it("should provide context record", async () => {
-    const provider = await fixture<FakeProvider>(html`
-      <${fakeProviderTag}>
-        <${fakeConsumerTag}></${fakeConsumerTag}>
-      </${fakeProviderTag}>
-    `);
-
-    const consumer = provider.firstElementChild as FakeConsumer;
+    const [provider, consumer] = await buildFixture();
 
     (provider as any).ctxA = 12.5;
     expect(consumer.ctxA).to.equal(12.5);
@@ -187,5 +162,25 @@ describe("provideContextRecord", () => {
 
     provider.contextAccessor.ctxB = "chicken";
     expect(consumer.ctxB).to.equal("chicken");
+  });
+
+  it("should derive context", async () => {
+    const [provider, consumer] = await buildFixture();
+    expect(consumer.ctxC).to.equal(`${fakeContext.defaultValue} apples`);
+    provider.context = 50;
+    expect(consumer.ctxC).to.equal(`50 apples`);
+    provider.context = 100;
+    expect(consumer.ctxC).to.equal(`100 apples`);
+  });
+});
+
+describe("derivedContext", () => {
+  it("should derive context", async () => {
+    const [provider, consumer] = await buildFixture();
+    expect(consumer.derivedCtx).to.equal(`${fakeContext.defaultValue} apples`);
+    provider.context = 50;
+    expect(consumer.derivedCtx).to.equal(`50 apples`);
+    provider.context = 100;
+    expect(consumer.derivedCtx).to.equal(`100 apples`);
   });
 });

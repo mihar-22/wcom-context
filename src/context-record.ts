@@ -46,7 +46,7 @@ export function provideContextRecord(
   record: ContextRecord<any>,
   transformProviderName = (prop: string) => prop
 ) {
-  return function decoratePlayerContextProvider(constructor: Function): void {
+  return function decorateContextRecordProvider(constructor: Function): void {
     const proto = constructor.prototype;
     Object.keys(record).forEach((prop) => {
       record[prop].provide()(proto, transformProviderName(prop));

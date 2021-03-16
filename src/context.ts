@@ -10,7 +10,56 @@ import {
   Consumer,
   Provider,
   ProviderPropertyDescriptor,
+  DerivedContext,
 } from "./types";
+
+/**
+ * Derives a context from another that was created with `createContext`.
+ *
+ * @param context - The context to derive values from as it updates.
+ * @param derivation - Takes the original context value and outputs the derived value.
+ */
+export function derivedContext<T, R>(
+  context: Context<T>,
+  derivation: (value: T) => R
+): DerivedContext<R> {
+  const CONSUME_KEY = (Symbol() as unknown) as string;
+  const PROVIDE_KEY = (Symbol() as unknown) as string;
+  const defaultValue = derivation(context.defaultValue);
+  const derivedContext = createContext(defaultValue);
+
+  return {
+    defaultValue,
+    consume() {
+      return function consumeDerivedContext(consumerProto, propertyKey) {
+        Object.defineProperty(consumerProto, CONSUME_KEY, {
+          set(newValue: T) {
+            this[propertyKey] = derivation(newValue);
+          },
+          enumerable: true,
+          configurable: true,
+        });
+
+        context.consume()(consumerProto, CONSUME_KEY);
+        derivedContext.consume()(consumerProto, propertyKey);
+      };
+    },
+    provide() {
+      return function provideDerivedContext(providerProto) {
+        Object.defineProperty(providerProto, CONSUME_KEY, {
+          set(newValue: T) {
+            this[PROVIDE_KEY] = newValue;
+          },
+          enumerable: true,
+          configurable: true,
+        });
+
+        context.provide()(providerProto, CONSUME_KEY);
+        derivedContext.provide()(providerProto, PROVIDE_KEY);
+      };
+    },
+  };
+}
 
 /**
  * Creates a new context that enables data to be passed down the component tree without having

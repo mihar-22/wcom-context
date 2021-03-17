@@ -1,5 +1,5 @@
 import { Context, DerivedContext } from "./types";
-import { isDerivedContext } from "./utils";
+import { isDerivedContext, isFunction } from "./utils";
 
 export type ContextRecord<R extends Record<string, unknown>> = {
   readonly [P in keyof R]: Context<R[P]>;
@@ -98,11 +98,11 @@ export function contextRecordProvider(
     proto: any,
     propertyKey: string
   ): void {
-    const context = {};
-    let hasInit = false;
+    const contexts = new Map<any, any>();
 
     function init(this: any) {
       const provider = this;
+      const context = {};
 
       Object.keys(record).forEach((prop) => {
         const propName = transformProviderName(prop);
@@ -126,13 +126,19 @@ export function contextRecordProvider(
         });
       });
 
-      hasInit = true;
+      contexts.set(provider, context);
       return context;
     }
 
+    const { disconnectedCallback } = proto;
+    proto.disconnectedCallback = function (this: any) {
+      contexts.delete(this);
+      if (isFunction(disconnectedCallback)) disconnectedCallback.call(this);
+    };
+
     Object.defineProperty(proto, propertyKey, {
       get() {
-        return hasInit ? context : init.call(this);
+        return contexts.get(this) || init.call(this);
       },
       enumerable: true,
       configurable: true,

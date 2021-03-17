@@ -8,9 +8,11 @@ import {
   fakeContextRecord,
   fakeContextTwo,
   fakeDerivedContext,
+  fakeDerivedContextTwo,
 } from "./fakeContext";
 
 @fakeDerivedContext.provide()
+@fakeDerivedContextTwo.provide()
 @provideContextRecord(fakeContextRecord)
 export class FakeProvider extends HTMLElement {
   @fakeContext.provide()

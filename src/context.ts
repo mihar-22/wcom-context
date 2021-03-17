@@ -11,20 +11,23 @@ import {
   Provider,
   ProviderPropertyDescriptor,
   DerivedContext,
+  ExtractContextArray,
 } from "./types";
 
 /**
  * Derives a context from another that was created with `createContext`.
  *
- * @param context - The context to derive values from as it updates.
+ * @param contexts - The contexts to derive values from as it updates.
  * @param derivation - Takes the original context value and outputs the derived value.
  */
-export function derivedContext<T, R>(
-  context: Context<T>,
-  derivation: (value: T) => R
+export function derivedContext<T extends readonly Context<any>[], R>(
+  contexts: T,
+  derivation: (...values: ExtractContextArray<T>) => R
 ): DerivedContext<R> {
   const key = Symbol();
-  const defaultValue = derivation(context.defaultValue);
+  const defaultValue = derivation(
+    ...(contexts.map((c) => c.defaultValue) as any)
+  );
   const derivedContext = createContext(defaultValue);
 
   return {
@@ -35,17 +38,32 @@ export function derivedContext<T, R>(
         const proto = isFunction(ctor) ? ctor.prototype : ctor;
         const { connectedCallback, disconnectedCallback } = proto;
 
-        let stop: () => void;
+        let ready = false;
+        const values: unknown[] = [];
+        const dispose: (() => void)[] = [];
+
+        function sync(this: any) {
+          this[key] = derivation(...(values as any));
+        }
 
         proto.connectedCallback = function () {
-          stop = context.watch(this, (newValue) => {
-            this[key] = derivation(newValue);
+          contexts.forEach((context, i) => {
+            const stop = context.watch(this, (newValue) => {
+              values[i] = newValue;
+              if (ready) sync.call(this);
+            });
+
+            dispose.push(stop);
           });
+
+          ready = true;
+          sync.call(this);
+
           if (isFunction(connectedCallback)) connectedCallback.call(this);
         };
 
         proto.disconnectedCallback = function () {
-          stop();
+          dispose.forEach((fn) => fn());
           if (isFunction(disconnectedCallback)) disconnectedCallback.call(this);
         };
 

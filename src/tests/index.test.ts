@@ -169,8 +169,8 @@ describe("provideContextRecord", () => {
     expect(consumer.ctxC).to.equal(`${fakeContext.defaultValue} apples`);
     provider.context = 50;
     expect(consumer.ctxC).to.equal(`50 apples`);
-    // provider.context = 100;
-    // expect(consumer.ctxC).to.equal(`100 apples`);
+    provider.context = 100;
+    expect(consumer.ctxC).to.equal(`100 apples`);
   });
 });
 
@@ -182,5 +182,17 @@ describe("derivedContext", () => {
     expect(consumer.derivedCtx).to.equal(`50 apples`);
     provider.context = 100;
     expect(consumer.derivedCtx).to.equal(`100 apples`);
+  });
+
+  it("should derive context with multiple inputs", async () => {
+    const [provider, consumer] = await buildFixture();
+    expect(consumer.derivedCtxTwo).to.equal(
+      `${fakeContext.defaultValue} apples apples`
+    );
+    provider.context = 50;
+    expect(consumer.derivedCtxTwo).to.equal(`50 apples apples`);
+    provider.context = 100;
+    provider.contextTwo = "chicken";
+    expect(consumer.derivedCtxTwo).to.equal(`100 apples chicken`);
   });
 });

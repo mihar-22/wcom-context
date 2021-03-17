@@ -3,6 +3,7 @@ import {
   fakeContextRecord,
   fakeContextTwo,
   fakeDerivedContext,
+  fakeDerivedContextTwo,
 } from "./fakeContext";
 
 export class FakeConsumer extends HTMLElement {
@@ -29,4 +30,7 @@ export class FakeConsumer extends HTMLElement {
 
   @fakeDerivedContext.consume()
   derivedCtx = fakeDerivedContext.defaultValue;
+
+  @fakeDerivedContextTwo.consume()
+  derivedCtxTwo = fakeDerivedContextTwo.defaultValue;
 }

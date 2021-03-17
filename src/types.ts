@@ -11,6 +11,12 @@ export interface ContextOptions<T> {
 
 export type StopWatching = () => void;
 
+export type ExtractContextType<Type> = Type extends Context<infer X> ? X : void;
+
+export type ExtractContextArray<T extends readonly Context<any>[]> = {
+  [K in keyof T]: ExtractContextType<T[K]>;
+};
+
 export interface Context<T> {
   provide(): PropertyDecorator<any>;
   consume(options?: ContextOptions<T>): PropertyDecorator<any>;

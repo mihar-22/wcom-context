@@ -1,5 +1,5 @@
 import { Context, DerivedContext } from "./types";
-import { isDerivedContext, isFunction } from "./utils";
+import { isDerivedContext } from "./utils";
 
 export type ContextRecord<R extends Record<string, unknown>> = {
   readonly [P in keyof R]: Context<R[P]>;
@@ -99,6 +99,7 @@ export function contextRecordProvider(
     propertyKey: string
   ): void {
     const context = {};
+    let hasInit = false;
 
     function init(this: any) {
       const provider = this;
@@ -124,17 +125,14 @@ export function contextRecordProvider(
           configurable: true,
         });
       });
-    }
 
-    const { connectedCallback } = proto;
-    proto.connectedCallback = function () {
-      init.call(this);
-      if (isFunction(connectedCallback)) connectedCallback.call(this);
-    };
+      hasInit = true;
+      return context;
+    }
 
     Object.defineProperty(proto, propertyKey, {
       get() {
-        return context;
+        return hasInit ? context : init.call(this);
       },
       enumerable: true,
       configurable: true,

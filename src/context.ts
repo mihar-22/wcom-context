@@ -63,6 +63,7 @@ export function derivedContext<T extends readonly Context<any>[], R>(
         };
 
         proto.disconnectedCallback = function () {
+          ready = false;
           dispose.forEach((fn) => fn());
           if (isFunction(disconnectedCallback)) disconnectedCallback.call(this);
         };

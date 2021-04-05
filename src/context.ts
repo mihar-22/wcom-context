@@ -1,10 +1,10 @@
-import { fireEventAndRetry, isFunction, notEqual } from "./utils";
+import { fireEventAndRetry, isFunction, notEqual } from "./utils.js";
 import {
   ConsumerConnectEvent,
   ConsumerConnectEventDetail,
   ConsumerDisconnectEvent,
   ProviderUpdateEvent,
-} from "./events";
+} from "./events.js";
 import {
   Context,
   Consumer,
@@ -12,7 +12,7 @@ import {
   ProviderPropertyDescriptor,
   DerivedContext,
   ExtractContextArray,
-} from "./types";
+} from "./types.js";
 
 /**
  * Derives a context from another that was created with `createContext`.

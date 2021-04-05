@@ -1,7 +1,7 @@
-import { createContext, derivedContext } from "./context";
+import { createContext, derivedContext } from "./context.js";
 
-export * from "./types";
-export * from "./events";
-export * from "./context-record";
+export * from "./types.js";
+export * from "./events.js";
+export * from "./context-record.js";
 export { derivedContext };
 export default createContext;

@@ -1,4 +1,4 @@
-import { DerivedContext } from "./types";
+import { DerivedContext } from "./types.js";
 
 export const isNull = (input: any): input is null => input === null;
 export const isUndefined = (input: any): input is undefined =>

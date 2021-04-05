@@ -1,5 +1,5 @@
-import { Context, DerivedContext } from "./types";
-import { isDerivedContext, isFunction } from "./utils";
+import { Context, DerivedContext } from "./types.js";
+import { isDerivedContext, isFunction } from "./utils.js";
 
 export type ContextRecord<R extends Record<string, unknown>> = {
   readonly [P in keyof R]: Context<R[P]>;

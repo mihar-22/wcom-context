@@ -2,6 +2,7 @@
   "name": "@wcom/context",
   "version": "0.0.0",
   "license": "MIT",
+  "sideEffects": false,
   "author": "Rahim Alwer <rahim_alwer@outlook.com>",
   "description": "Pass props down web component trees easily.",
   "type": "module",

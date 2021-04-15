@@ -7,6 +7,11 @@ export interface ContextOptions<T> {
    * This can be used to transform/manipulate the value before it is consumed.
    */
   transform: (value: T) => T;
+
+  /**
+   * Optional callback for when the consumer fails to connect to a provider.
+   */
+  onCouldNotFindProvider?(name: string): void;
 }
 
 export type StopWatching = () => void;

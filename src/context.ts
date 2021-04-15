@@ -12,6 +12,7 @@ import {
   ProviderPropertyDescriptor,
   DerivedContext,
   ExtractContextArray,
+  noop,
 } from "./types.js";
 
 /**
@@ -229,9 +230,9 @@ export function createContext<T>(defaultValue: T): Context<T> {
           };
 
           const onCouldNotFindProvider = () => {
-            throw Error(
-              `Failed to find matching context provider for: \`${this.constructor.name}\``
-            );
+            const callback =
+              (options && options.onCouldNotFindProvider) || noop;
+            callback(this.constructor.name);
           };
 
           // Upon connection, the consumer dispatches an event to discover a
